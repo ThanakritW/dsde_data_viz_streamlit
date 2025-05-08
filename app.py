@@ -341,6 +341,9 @@ try:
     viz_data_traffy = filtered_data_traffy[filtered_data_traffy['district'].isin(top_clusters.index)].copy()
     viz_data_traffy['color'] = viz_data_traffy['district'].map(cluster_colors)
     
+    avg_lat = viz_data_traffy['position'].apply(lambda x: x[1]).mean()
+    avg_lon = viz_data_traffy['position'].apply(lambda x: x[0]).mean()  
+
     # Scatter map for clusters
     scatter_layer = pdk.Layer(
         "ScatterplotLayer",
@@ -354,17 +357,18 @@ try:
     scatter_map = pdk.Deck(
         map_style=MAP_STYLES[map_style],
         initial_view_state=pdk.ViewState(
-            latitude=13.7563,
-            longitude=100.5018,
-            zoom=11,
+            latitude=avg_lat,
+            longitude=avg_lon,
+            zoom=10,
             pitch=0,
         ),
         layers=[scatter_layer],
-        tooltip={"text": "ID: {ticket_id}\nDistrict: {district}\nSubdistrict: ฿{subdistrict}\nRating: {star}"},
+        tooltip={"text": "ID: {ticket_id}\nDistrict: {district}\nSubdistrict: {subdistrict}\nRating: {star}"},
     )
+    st.subheader("Scatter Map")
     st.pydeck_chart(scatter_map)
 
-    # Hexagon map for clusters
+    # Hexagon map showing count of points per hexagon
     hex_layer = pdk.Layer(
         "HexagonLayer",
         data=viz_data_traffy,
@@ -374,16 +378,14 @@ try:
         elevation_range=[0, 1000],
         pickable=True,
         opacity=0.5,
-        get_elevation_weight='star',
-        elevation_aggregation='MEAN',
     )
 
     hex_map = pdk.Deck(
         map_style=MAP_STYLES[map_style],
         initial_view_state=pdk.ViewState(
-            latitude=13.7563,
-            longitude=100.5018,
-            zoom=11,
+            latitude=avg_lat,
+            longitude=avg_lon,
+            zoom=10,
             pitch=0,
         ),
         layers=[hex_layer],
@@ -392,7 +394,58 @@ try:
             "style": {"backgroundColor": "black", "color": "white"}
         }
     )
+    st.subheader("Hex Map to Show Ticket Density")
     st.pydeck_chart(hex_map)
+
+    # HeatmapLayer showing average star rating
+    heat_layer = pdk.Layer(
+        "HeatmapLayer",
+        data=viz_data_traffy,
+        get_position='position',
+        get_weight='star',  # use star rating as weight
+        radiusPixels=20,
+        aggregation=pdk.types.String("MEAN"),
+    )
+
+    heat_map = pdk.Deck(
+        map_style=MAP_STYLES[map_style],
+        initial_view_state=pdk.ViewState(
+            latitude=avg_lat,
+            longitude=avg_lon,
+            zoom=10,
+            pitch=0,
+        ),
+        layers=[heat_layer],
+    )
+
+    st.subheader("Heat Map of Average Star Rating (Actual)")
+    st.pydeck_chart(heat_map)
+
+    # HeatmapLayer showing average star rating
+    pheat_layer = pdk.Layer(
+        "HeatmapLayer",
+        data=viz_data_traffy,
+        get_position='position',
+        get_weight='star_predicted',  # use star rating as weight
+        radiusPixels=20,
+        aggregation=pdk.types.String("MEAN"),
+    )
+
+    pheat_map = pdk.Deck(
+        map_style=MAP_STYLES[map_style],
+        initial_view_state=pdk.ViewState(
+            latitude=avg_lat,
+            longitude=avg_lon,
+            zoom=10,
+            pitch=0,
+        ),
+        layers=[pheat_layer],
+    )
+
+    st.subheader("Heat Map of Average Star Rating (Predicted)")
+    st.pydeck_chart(pheat_map)
+
+
 
 except Exception as e:
     st.error(f"Error in clustering analysis: {e}")
