@@ -113,11 +113,11 @@ with col1:
 with col2:
     st.metric("Total Correct", total_correct)
 with col3:
-    st.metric("F1-score", f"{f1:.3f}") # Format with 3 decimal places
+    st.metric("F1-score", f"{f1:.3f}")
 with col4:
-    st.metric("Accuracy", f"{accuracy:.3f}") # Format with 3 decimal places
+    st.metric("Accuracy", f"{accuracy:.3f}") 
 with col5:
-    st.metric("Average", f"⭐{average:.1f}") # Format with 1 decimal places
+    st.metric("Average", f"⭐{average:.1f}") 
 
 # Confusion Matrix
 @st.cache_resource
@@ -208,8 +208,6 @@ st.plotly_chart(fig_mean)
 st.plotly_chart(fig_avg_corr)
 st.write(f"**Pearson Correlation Coefficient (Average):** {correlation_avg:.3f}")
 
-
-
 # District and Subdistrict Analysis functions (cached)
 @st.cache_resource
 def plot_district_analysis(df, rating_col, title_suffix=""):
@@ -257,7 +255,7 @@ def plot_subdistrict_analysis(df, selected_district, rating_col, title_suffix=""
         y='avg_star',
         text='subdistrict',
         labels={'row_count': 'Number of Tickets', 'avg_star': 'Average Star'},
-        title=f'Subdistrict-wise Ticket Volume vs. Average Star in {selected_district}'
+        title=f'Subdistrict-wise Ticket Volume vs. Average Star in {selected_district} {title_suffix}'
     )
 
     # Add average lines
@@ -325,7 +323,7 @@ if rating_source in ("Both", "Only Predicted"):
     plot_subdistrict_analysis(filtered_data_traffy, selected_district, "star_predicted", title_suffix="(Predicted)")
 
 
-# Hotspot Analysis (largely unchanged, but make sure viz_data_traffy is derived from filtered_data_traffy)
+# Hotspot Analysis 
 st.header('Ticket Hotspot Analysis')
 
 try:
@@ -424,7 +422,7 @@ try:
     st.subheader("Heat Map of Average Star Rating (Actual)")
     st.pydeck_chart(heat_map)
 
-    # HeatmapLayer showing average star rating
+    # HeatmapLayer showing average star rating for Predicted
     pheat_layer = pdk.Layer(
         "HeatmapLayer",
         data=viz_data_traffy,
