@@ -91,6 +91,7 @@ def calculate_evaluation_metrics(df):
         y_true = conf_matrix_data["star"].astype(int)
         y_pred = conf_matrix_data["star_predicted"].astype(int)
 
+        average = y_pred.mean()
         total_predict = len(y_pred)
         total_correct = (y_true == y_pred).sum()
         accuracy = total_correct / total_predict if total_predict > 0 else 0  # Prevent ZeroDivisionError
@@ -98,15 +99,15 @@ def calculate_evaluation_metrics(df):
         # Calculate F1-score using sklearn
         f1 = f1_score(y_true, y_pred, average='weighted')  # Use weighted for multi-class
 
-        return total_predict, total_correct, f1, accuracy
+        return total_predict, total_correct, f1, accuracy, average
     return 0, 0, 0, 0  # Return zeros if no data
 
 
 # Display Evaluation Metrics
 st.header("Model Evaluation Metrics")
-total_predict, total_correct, f1, accuracy = calculate_evaluation_metrics(filtered_data_traffy)
+total_predict, total_correct, f1, accuracy, average = calculate_evaluation_metrics(filtered_data_traffy)
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
     st.metric("Total Predicted", total_predict)
 with col2:
@@ -115,6 +116,8 @@ with col3:
     st.metric("F1-score", f"{f1:.3f}") # Format with 3 decimal places
 with col4:
     st.metric("Accuracy", f"{accuracy:.3f}") # Format with 3 decimal places
+with col5:
+    st.metric("Average", f"⭐{average:.1f}") # Format with 1 decimal places
 
 # Confusion Matrix
 @st.cache_resource
