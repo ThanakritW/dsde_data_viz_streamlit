@@ -388,7 +388,7 @@ try:
         ),
         layers=[hex_layer],
         tooltip={
-            "html": "<b>Average Star:</b> {elevationValue}",
+            "html": "<b>Count:</b> {elevationValue}",
             "style": {"backgroundColor": "black", "color": "white"}
         }
     )
